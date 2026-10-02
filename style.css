@@ -1,0 +1,502 @@
+/* ===== 기본 리셋 ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@font-face {
+  font-family: "Exposure Trial";
+  src: url("assets/fonts/ExposureTrial-10.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+html,
+body {
+  height: 100%;
+  overflow: hidden; /* 스크롤 없음 */
+}
+
+body {
+  --gutter: 20px;
+  --max-w: calc(100vw - 80px);
+  --max-h: calc(100vh - 80px);
+  --s-from-w: calc((var(--max-w) - 3 * var(--gutter)) / 4);
+  --s-from-h: calc((var(--max-h) - 2 * var(--gutter)) / 3);
+  --s: min(var(--s-from-w), var(--s-from-h));
+
+  font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  background: #7b8767; /* 올리브 그린 */
+  color: #2c2c2c;
+}
+
+/* ===== 좌우 세로 마퀴 ===== */
+.side-marquee {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  width: calc(var(--s) * 0.2);
+  display: flex;
+  justify-content: center;
+}
+
+.side-marquee--left {
+  left: 20px;
+}
+
+.side-marquee--right {
+  right: 20px;
+}
+
+.side-marquee__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5em;
+  font-family: "Exposure Trial", "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: calc(var(--s) * 0.175); /* 위젯 1 타이틀과 동일 */
+  font-weight: 400;
+  line-height: 1;
+  color: #fff;
+  will-change: transform;
+}
+
+.side-marquee__item {
+  writing-mode: vertical-rl;
+  text-orientation: mixed;
+  white-space: nowrap;
+}
+
+.side-marquee--left .side-marquee__track {
+  animation: marquee-up 18s linear infinite;
+}
+
+.side-marquee--right .side-marquee__track {
+  animation: marquee-down 18s linear infinite;
+}
+
+@keyframes marquee-up {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+@keyframes marquee-down {
+  from {
+    transform: translateY(-50%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* ===== 페이지: 상하좌우 40px 마진 ===== */
+.page {
+  position: relative;
+  z-index: 2;
+  height: 100%;
+  padding: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== 벤토 그리드 =====
+   - 12컬럼 / gutter 20px
+   - 작은 위젯 = 3컬럼 폭 (= 정사각형 한 변 --s)
+   - 큰 위젯(1번) = 6컬럼 × 2행 → 정사각형 유지
+   - 7번 = 6컬럼 × 1행 → 가로로 긴 직사각형
+
+   화면이 가로로 길면 세로(상하 40px)에 맞추고,
+   세로로 길면 가로(좌우 40px)에 맞춤 → 항상 정사각형 유지
+*/
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(3, var(--s));
+  gap: var(--gutter);
+  width: calc(4 * var(--s) + 3 * var(--gutter));
+  height: calc(3 * var(--s) + 2 * var(--gutter));
+  overflow: visible;
+}
+
+/* ===== 위젯 공통 ===== */
+.widget {
+  background: #efefef;
+  overflow: hidden;
+}
+
+/* 1번: 6컬럼 × 2행 → 정사각형 */
+.widget--playlist {
+  grid-column: 1 / 7;
+  grid-row: 1 / 3;
+}
+
+/* 2~5: 각 3컬럼 × 1행 → 정사각형 */
+.widget--2 {
+  grid-column: 7 / 10;
+  grid-row: 1;
+}
+
+.widget--3 {
+  grid-column: 10 / 13;
+  grid-row: 1;
+}
+
+.widget--4 {
+  grid-column: 7 / 10;
+  grid-row: 2;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2%;
+  box-sizing: border-box;
+}
+
+/* ===== 4번: 재생 컨트롤러 + 원형 progress ===== */
+.transport-wrap {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.transport-wrap[hidden] {
+  display: none;
+}
+
+.transport__progress {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg); /* 진행이 12시 방향부터 시작 */
+  pointer-events: none;
+}
+
+.transport__track,
+.transport__bar {
+  fill: none;
+  stroke-width: 2; /* 안쪽 영역 기준 약 2% */
+  stroke-linecap: butt;
+}
+
+.transport__track {
+  stroke: transparent;
+}
+
+.transport__bar {
+  stroke: #7d876d;
+  stroke-dasharray: 307.876; /* 2 * π * 49 */
+  stroke-dashoffset: 307.876;
+  transition: stroke-dashoffset 0.1s linear;
+}
+
+.transport {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: #7d876d;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+
+.transport__arrow {
+  /* 260 기준 180 → 약 69.23% */
+  width: calc(var(--s) * 180 / 260);
+  height: calc(var(--s) * 180 / 260);
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+.transport__icon {
+  font-size: calc(var(--s) * 0.28);
+  line-height: 1;
+  user-select: none;
+}
+
+.transport__icon--pause {
+  font-size: calc(var(--s) * 0.26);
+  letter-spacing: 0.05em;
+}
+
+.transport__icon[hidden],
+.transport__arrow[hidden] {
+  display: none;
+}
+
+.widget--5 {
+  grid-column: 10 / 13;
+  grid-row: 2;
+}
+
+/* 6~8: 아래 줄 */
+.widget--6 {
+  grid-column: 1 / 4;
+  grid-row: 3;
+  background: transparent;
+  overflow: hidden;
+}
+
+.quad {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 3.077%;
+  width: 100%;
+  height: 100%;
+}
+
+.quad__cell {
+  background: #efefef;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.quad__cell.is-dimmed {
+  opacity: 0.2; /* 20% */
+}
+
+/* 7번: 6컬럼 × 1행 → 가로로 긴 칸 */
+.widget--7 {
+  grid-column: 4 / 10;
+  grid-row: 3;
+  background: transparent;
+  overflow: hidden;
+}
+
+.widget--7 .widget__image,
+.widget--8 .widget__image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+.widget--8 {
+  grid-column: 10 / 13;
+  grid-row: 3;
+  background: transparent;
+  overflow: hidden;
+}
+
+/* ===== 2·3번: 플립 시계 ===== */
+.widget--clock {
+  position: relative;
+  perspective: calc(var(--s) * 2);
+}
+
+/* 가운데 접히는 선 */
+.widget--clock::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #7d876d;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.flip {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  font-family: "Exposure Trial", "Iowan Old Style", Palatino, Georgia, serif;
+  font-size: calc(var(--s) * 220 / 260);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.05em; /* -5% */
+  color: #7d876d;
+  font-variant-numeric: tabular-nums;
+  background: #efefef;
+  transform-style: preserve-3d;
+}
+
+.flip__base,
+.flip__flap {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 50%;
+  overflow: hidden;
+  background: #efefef;
+}
+
+.flip__base span,
+.flip__flap span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 200%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* letter-spacing 보정: 글자가 오른쪽으로 치우쳐 보이지 않게 */
+  padding-right: 0.05em;
+  box-sizing: border-box;
+}
+
+.flip__base--top,
+.flip__flap--top {
+  top: 0;
+}
+
+.flip__base--bottom,
+.flip__flap--bottom {
+  bottom: 0;
+}
+
+.flip__base--top span,
+.flip__flap--top span {
+  top: 0;
+}
+
+.flip__base--bottom span,
+.flip__flap--bottom span {
+  bottom: 0;
+}
+
+.flip__flap--top {
+  transform-origin: bottom center;
+  z-index: 3;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.flip__flap--bottom {
+  transform-origin: top center;
+  z-index: 2;
+  transform: rotateX(90deg);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* 플립 중: 위 판이 앞으로 넘어가고, 아래 판이 이어서 올라옴 */
+.flip.is-flipping .flip__flap--top {
+  animation: flip-top 0.28s ease-in forwards;
+}
+
+.flip.is-flipping .flip__flap--bottom {
+  animation: flip-bottom 0.28s ease-out 0.28s forwards;
+}
+
+@keyframes flip-top {
+  from {
+    transform: rotateX(0deg);
+  }
+  to {
+    transform: rotateX(-90deg);
+  }
+}
+
+@keyframes flip-bottom {
+  from {
+    transform: rotateX(90deg);
+  }
+  to {
+    transform: rotateX(0deg);
+  }
+}
+
+/* ===== 플레이리스트 ===== */
+.playlist {
+  height: 100%;
+  padding: 20px 24px 24px 28px;
+  display: flex;
+  flex-direction: column;
+  color: #7d876d;
+  font-family: "Exposure Trial", "Iowan Old Style", Palatino, Georgia, serif;
+}
+
+.playlist__header {
+  flex-shrink: 0;
+}
+
+.playlist__title {
+  font-size: calc(var(--s) * 0.175);
+  font-weight: 400;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+}
+
+.playlist__title-line {
+  display: block;
+}
+
+.playlist__list {
+  list-style: none;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 0.045);
+  padding-bottom: calc(var(--s) * 0.02);
+}
+
+.playlist__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.playlist__item:hover {
+  opacity: 0.7;
+}
+
+.playlist__item.is-active {
+  opacity: 1;
+}
+
+.playlist__song {
+  font-size: calc(var(--s) * 0.163);
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.playlist__duration {
+  flex-shrink: 0;
+  font-size: calc(var(--s) * 0.163);
+  font-weight: 400;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
