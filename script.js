@@ -5,34 +5,35 @@
 */
 const tracks = [
   {
-    title: "December",
-    duration: "2:37",
-    src: "assets/music/Sample.mp3",
+    title: "Falling Off A Horse",
+    duration: "5:21",
+    src: "assets/music/Falling-Off-A-Horse.mp3",
+    playlistLines: ["Frances Ha", "Official Playlist"],
+  },
+  {
+    title: "Chicago",
+    duration: "4:35",
+    src: "assets/music/Chicago.mp3",
     playlistLines: ["The Bear", "Official Playlist"],
+    volume: 0.8, /* 이 곡만 80% 볼륨 */
   },
   {
-    title: "Home",
-    duration: "2:37",
-    src: "assets/music/Sample.mp3",
-    playlistLines: ["Sunday Morning", "Kitchen Mix"],
+    title: "Glide",
+    duration: "3:41",
+    src: "assets/music/Glide.mp3",
+    playlistLines: ["After Yang", "Official Playlist"],
   },
   {
-    title: "Ikokuyuki",
-    duration: "2:37",
-    src: "assets/music/Sample.mp3",
-    playlistLines: ["Night Drive", "Vol. 01"],
+    title: "Centrifuge",
+    duration: "2:09",
+    src: "assets/music/Centrifuge.mp3",
+    playlistLines: ["Project Hail Mary", "Official Playlist"],
   },
   {
-    title: "Coffee & TV",
-    duration: "2:37",
-    src: "assets/music/Sample.mp3",
-    playlistLines: ["Cafe Hours", "Soft Focus"],
-  },
-  {
-    title: "Under Pressure",
-    duration: "2:37",
-    src: "assets/music/Sample.mp3",
-    playlistLines: ["Late Shift", "Official Playlist"],
+    title: "Then You Can Tell Me Goodbye",
+    duration: "3:46",
+    src: "assets/music/Then-You-Can-Tell-Me-Goodbye.mp3",
+    playlistLines: ["The End Of The F**ing World", "Official Playlist"],
   },
 ];
 
@@ -47,10 +48,20 @@ const transportPlay = document.getElementById("transport-play");
 const transportPause = document.getElementById("transport-pause");
 const progressBar = document.getElementById("progress-bar");
 
+const sideSongEls = document.querySelectorAll("[data-side-song]");
 const PROGRESS_CIRCUMFERENCE = 2 * Math.PI * 49;
 
 let currentIndex = -1;
 let isPlaying = false;
+
+/* ===== 좌우 Now Playing 곡 제목 ===== */
+function updateSideLabels() {
+  const track = currentIndex >= 0 ? tracks[currentIndex] : null;
+  const title = track ? track.title : "";
+  sideSongEls.forEach((el) => {
+    el.textContent = title;
+  });
+}
 
 /* ===== 상단 타이틀 바꾸기 ===== */
 function updatePlaylistTitle(track) {
@@ -72,10 +83,7 @@ function renderPlaylist() {
     button.className = "playlist__item";
     button.dataset.index = String(index);
 
-    button.innerHTML = `
-      <span class="playlist__song">${track.title}</span>
-      <span class="playlist__duration">${track.duration}</span>
-    `;
+    button.innerHTML = `<span class="playlist__song">${track.title}</span>`;
 
     button.addEventListener("click", () => playTrack(index));
     li.appendChild(button);
@@ -103,6 +111,9 @@ function playTrack(index) {
   updatePlaylistTitle(track);
   updateActiveItem();
   updateTransport();
+
+  /* 곡별 볼륨 (없으면 100%) */
+  audio.volume = typeof track.volume === "number" ? track.volume : 1;
 
   if (!isSameTrack) {
     audio.src = track.src;
@@ -174,6 +185,7 @@ function updateActiveItem() {
 function updateTransport() {
   transportWrap.hidden = false;
   transportBtn.classList.toggle("is-playing", isPlaying);
+  updateSideLabels();
 
   if (currentIndex < 0) {
     transportArrow.hidden = false;
@@ -320,10 +332,10 @@ updateTransport();
 updateClock(true);
 setInterval(() => updateClock(false), 1000);
 
-/* ===== 6번: 사각형 클릭 시 opacity 토글 ===== */
+/* ===== 6번: 클릭 시 커피 아이콘 토글 ===== */
 document.querySelectorAll(".quad__cell").forEach((cell) => {
   cell.addEventListener("click", () => {
     const dimmed = cell.classList.toggle("is-dimmed");
-    cell.setAttribute("aria-pressed", dimmed ? "true" : "false");
+    cell.setAttribute("aria-pressed", dimmed ? "false" : "true");
   });
 });

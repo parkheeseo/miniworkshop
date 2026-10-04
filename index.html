@@ -4,33 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Heeseo — Intro</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- 좌우 세로 흐르는 텍스트 -->
-    <div class="side-marquee side-marquee--left" aria-hidden="true">
-      <div class="side-marquee__track">
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-      </div>
+    <!-- 좌우 세로 고정 텍스트 -->
+    <div class="side-label side-label--left" aria-hidden="true">
+      <span class="side-label__kicker">Now Playing</span>
+      <span class="side-label__song" data-side-song></span>
     </div>
-    <div class="side-marquee side-marquee--right" aria-hidden="true">
-      <div class="side-marquee__track">
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-        <span class="side-marquee__item">Heeseo Park</span>
-      </div>
+    <div class="side-label side-label--right" aria-hidden="true">
+      <span class="side-label__kicker">Now Playing</span>
+      <span class="side-label__song" data-side-song></span>
     </div>
 
     <main class="page">
@@ -97,18 +87,40 @@
                 alt=""
                 aria-hidden="true"
               />
-              <span class="transport__icon transport__icon--play" id="transport-play" aria-hidden="true" hidden>▶</span>
-              <span class="transport__icon transport__icon--pause" id="transport-pause" aria-hidden="true" hidden>❚❚</span>
+              <img
+                class="transport__icon transport__icon--play"
+                id="transport-play"
+                src="assets/images/play.svg?v=2"
+                alt=""
+                aria-hidden="true"
+                hidden
+              />
+              <img
+                class="transport__icon transport__icon--pause"
+                id="transport-pause"
+                src="assets/images/stop.svg?v=2"
+                alt=""
+                aria-hidden="true"
+                hidden
+              />
             </button>
           </div>
         </section>
         <section class="widget widget--5" aria-label="위젯 5"></section>
         <section class="widget widget--6" aria-label="위젯 6">
           <div class="quad">
-            <button type="button" class="quad__cell" aria-pressed="false" aria-label="칸 1"></button>
-            <button type="button" class="quad__cell is-dimmed" aria-pressed="true" aria-label="칸 2"></button>
-            <button type="button" class="quad__cell is-dimmed" aria-pressed="true" aria-label="칸 3"></button>
-            <button type="button" class="quad__cell is-dimmed" aria-pressed="true" aria-label="칸 4"></button>
+            <button type="button" class="quad__cell is-dimmed" aria-pressed="false" aria-label="칸 1">
+              <img class="quad__icon" src="assets/images/coffee.svg" alt="" aria-hidden="true" />
+            </button>
+            <button type="button" class="quad__cell is-dimmed" aria-pressed="false" aria-label="칸 2">
+              <img class="quad__icon" src="assets/images/coffee.svg" alt="" aria-hidden="true" />
+            </button>
+            <button type="button" class="quad__cell is-dimmed" aria-pressed="false" aria-label="칸 3">
+              <img class="quad__icon" src="assets/images/coffee.svg" alt="" aria-hidden="true" />
+            </button>
+            <button type="button" class="quad__cell is-dimmed" aria-pressed="false" aria-label="칸 4">
+              <img class="quad__icon" src="assets/images/coffee.svg" alt="" aria-hidden="true" />
+            </button>
           </div>
         </section>
         <section class="widget widget--7" aria-label="손">

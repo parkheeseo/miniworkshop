@@ -8,9 +8,33 @@
 }
 
 @font-face {
-  font-family: "Exposure Trial";
-  src: url("assets/fonts/ExposureTrial-10.otf") format("opentype");
+  font-family: "HAL Repost";
+  src: url("assets/fonts/HALRepostUnlicensed-Regular.otf") format("opentype");
   font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "HAL Timezone";
+  src: url("assets/fonts/HALTimezoneUnlicensed-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PP Neue Montreal";
+  src: url("assets/fonts/PPNeueMontreal-Book.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "KMR Waldenburg";
+  src: url("assets/fonts/KMR-Waldenburg-HalbfettHalbschmal.otf") format("opentype");
+  font-weight: 400 700;
   font-style: normal;
   font-display: swap;
 }
@@ -22,82 +46,62 @@ body {
 }
 
 body {
-  --gutter: 20px;
+  /* 1440×990 기준 간격 14px → 화면 크기에 비례 */
+  --gutter: min(
+    calc((100vw - 80px) * 14 / 1218),
+    calc((100vh - 80px) * 14 / 910)
+  );
   --max-w: calc(100vw - 80px);
   --max-h: calc(100vh - 80px);
   --s-from-w: calc((var(--max-w) - 3 * var(--gutter)) / 4);
   --s-from-h: calc((var(--max-h) - 2 * var(--gutter)) / 3);
   --s: min(var(--s-from-w), var(--s-from-h));
 
-  font-family: "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", sans-serif;
+  font-family: "Inter", sans-serif;
   background: #7b8767; /* 올리브 그린 */
   color: #2c2c2c;
 }
 
-/* ===== 좌우 세로 마퀴 ===== */
-.side-marquee {
+/* ===== 좌우 세로 고정 텍스트 ===== */
+.side-label {
+  /* 1440×990 기준 패딩 28px → 화면 크기에 비례 */
+  --side-pad: min(calc(100vw * 28 / 1440), calc(100vh * 28 / 990));
+
   position: fixed;
-  top: 0;
-  bottom: 0;
   z-index: 1;
-  overflow: hidden;
   pointer-events: none;
-  width: calc(var(--s) * 0.2);
   display: flex;
-  justify-content: center;
-}
-
-.side-marquee--left {
-  left: 20px;
-}
-
-.side-marquee--right {
-  right: 20px;
-}
-
-.side-marquee__track {
-  display: flex;
+  /* writing-mode 기준 block 축 = 다음 줄 → Now Playing / 곡 제목 두 줄 */
   flex-direction: column;
-  align-items: center;
-  gap: 0.5em;
-  font-family: "Exposure Trial", "Iowan Old Style", Palatino, Georgia, serif;
-  font-size: calc(var(--s) * 0.175); /* 위젯 1 타이틀과 동일 */
+  gap: 0.35em;
+  font-family: "HAL Timezone", sans-serif;
+  font-size: calc(var(--s) * 0.163); /* 위젯 1 타이틀과 동일 */
   font-weight: 400;
   line-height: 1;
   color: #fff;
-  will-change: transform;
 }
 
-.side-marquee__item {
-  writing-mode: vertical-rl;
-  text-orientation: mixed;
+.side-label__kicker,
+.side-label__song {
+  display: block;
   white-space: nowrap;
 }
 
-.side-marquee--left .side-marquee__track {
-  animation: marquee-up 18s linear infinite;
+.side-label__song:empty {
+  display: none;
 }
 
-.side-marquee--right .side-marquee__track {
-  animation: marquee-down 18s linear infinite;
+.side-label--left {
+  left: var(--side-pad);
+  bottom: var(--side-pad);
+  writing-mode: sideways-lr; /* 아래에서부터, 다음 줄은 오른쪽 */
 }
 
-@keyframes marquee-up {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-50%);
-  }
-}
-
-@keyframes marquee-down {
-  from {
-    transform: translateY(-50%);
-  }
-  to {
-    transform: translateY(0);
-  }
+.side-label--right {
+  top: var(--side-pad);
+  right: var(--side-pad);
+  writing-mode: vertical-rl; /* 위에서부터, 다음 줄은 왼쪽 */
+  text-orientation: mixed;
 }
 
 /* ===== 페이지: 상하좌우 40px 마진 ===== */
@@ -112,7 +116,7 @@ body {
 }
 
 /* ===== 벤토 그리드 =====
-   - 12컬럼 / gutter 20px
+   - 12컬럼 / gutter: 1440×990 기준 14px (비율 스케일)
    - 작은 위젯 = 3컬럼 폭 (= 정사각형 한 변 --s)
    - 큰 위젯(1번) = 6컬럼 × 2행 → 정사각형 유지
    - 7번 = 6컬럼 × 1행 → 가로로 긴 직사각형
@@ -231,14 +235,12 @@ body {
 }
 
 .transport__icon {
-  font-size: calc(var(--s) * 0.28);
-  line-height: 1;
-  user-select: none;
-}
-
-.transport__icon--pause {
-  font-size: calc(var(--s) * 0.26);
-  letter-spacing: 0.05em;
+  /* 커피 아이콘 기준 × 1.5 */
+  width: calc(var(--s) * (1 - 0.03077) / 2 * 0.81 * 1.5);
+  height: calc(var(--s) * (1 - 0.03077) / 2 * 0.81 * 1.5);
+  display: block;
+  object-fit: contain;
+  pointer-events: none;
 }
 
 .transport__icon[hidden],
@@ -269,6 +271,9 @@ body {
 }
 
 .quad__cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: #efefef;
   border: none;
   padding: 0;
@@ -281,12 +286,26 @@ body {
   opacity: 0.2; /* 20% */
 }
 
+.quad__icon {
+  width: 105%; /* 81% × 1.3 */
+  height: 105%;
+  object-fit: contain;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  pointer-events: none;
+}
+
+/* 클릭해서 켜진 칸에만 아이콘 표시 */
+.quad__cell:not(.is-dimmed) .quad__icon {
+  opacity: 1;
+}
+
 /* 7번: 6컬럼 × 1행 → 가로로 긴 칸 */
 .widget--7 {
   grid-column: 4 / 10;
   grid-row: 3;
   background: transparent;
-  overflow: hidden;
+  overflow: visible; /* 흔들림이 잘리지 않게 */
 }
 
 .widget--7 .widget__image,
@@ -295,6 +314,29 @@ body {
   width: 100%;
   height: 100%;
   object-fit: fill;
+}
+
+/* 손이 손목 쪽에서 ±2° 흔들흔들 */
+.widget--7 .widget__image {
+  transform-origin: 42% 78%;
+  animation: hand-sway 2.8s cubic-bezier(0.37, 0, 0.63, 1) infinite;
+  will-change: transform;
+}
+
+@keyframes hand-sway {
+  0%,
+  100% {
+    transform: rotate(-2deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget--7 .widget__image {
+    animation: none;
+  }
 }
 
 .widget--8 {
@@ -317,8 +359,9 @@ body {
   left: 0;
   right: 0;
   top: 50%;
-  height: 1px;
-  background: #7d876d;
+  height: 3.077%; /* 6번 위젯 칸 간격과 동일 */
+  background: #7b8767; /* 페이지 배경색 = 간격처럼 보이게 */
+  transform: translateY(-50%);
   z-index: 5;
   pointer-events: none;
 }
@@ -327,13 +370,13 @@ body {
   position: relative;
   width: 100%;
   height: 100%;
-  font-family: "Exposure Trial", "Iowan Old Style", Palatino, Georgia, serif;
-  font-size: calc(var(--s) * 220 / 260);
+  font-family: "KMR Waldenburg", "Inter", sans-serif;
+  font-size: calc(var(--s) * 210 / 240);
   font-weight: 400;
   line-height: 1;
-  letter-spacing: -0.05em; /* -5% */
+  letter-spacing: -0.04em; /* -4% */
   color: #7d876d;
-  font-variant-numeric: tabular-nums;
+  font-variant-numeric: normal;
   background: #efefef;
   transform-style: preserve-3d;
 }
@@ -357,9 +400,10 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  /* letter-spacing 보정: 글자가 오른쪽으로 치우쳐 보이지 않게 */
-  padding-right: 0.05em;
   box-sizing: border-box;
+  /* letter-spacing 보정 + 서체 시각적 세로 중앙 */
+  padding-left: 0;
+  transform: translate(-0.02em, 0.02em);
 }
 
 .flip__base--top,
@@ -379,7 +423,7 @@ body {
 
 .flip__base--bottom span,
 .flip__flap--bottom span {
-  bottom: 0;
+  top: -100%;
 }
 
 .flip__flap--top {
@@ -427,11 +471,11 @@ body {
 /* ===== 플레이리스트 ===== */
 .playlist {
   height: 100%;
-  padding: 20px 24px 24px 28px;
+  padding: 3% 4%;
   display: flex;
   flex-direction: column;
   color: #7d876d;
-  font-family: "Exposure Trial", "Iowan Old Style", Palatino, Georgia, serif;
+  font-family: "HAL Timezone", "Inter", sans-serif;
 }
 
 .playlist__header {
@@ -439,14 +483,15 @@ body {
 }
 
 .playlist__title {
-  font-size: calc(var(--s) * 0.175);
+  font-size: calc(var(--s) * 0.163); /* 1440×990 기준 약 48px */
   font-weight: 400;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: -0.01em;
 }
 
 .playlist__title-line {
   display: block;
+  overflow: visible;
 }
 
 .playlist__list {
@@ -454,15 +499,12 @@ body {
   margin-top: auto;
   display: flex;
   flex-direction: column;
-  gap: calc(var(--s) * 0.045);
+  gap: calc(var(--s) * 0.03);
   padding-bottom: calc(var(--s) * 0.02);
 }
 
 .playlist__item {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 16px;
+  display: block;
   padding: 0;
   border: none;
   background: transparent;
@@ -484,19 +526,11 @@ body {
 }
 
 .playlist__song {
+  display: block;
   font-size: calc(var(--s) * 0.163);
   font-weight: 400;
-  line-height: 1;
+  line-height: 1.25;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  min-width: 0;
-}
-
-.playlist__duration {
-  flex-shrink: 0;
-  font-size: calc(var(--s) * 0.163);
-  font-weight: 400;
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
 }
